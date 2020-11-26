@@ -1,16 +1,44 @@
 import React, { Component } from 'react'
-import '../App.css'
+import { connect } from 'react-redux'
+import { addReminder, deleteReminder } from '../Actions'
 
 class App extends Component {
 	constructor(props) {
-		super(props)
+		super(props);
 		this.state = {
 			text: ''
 		}
 	}
 
+	// its helper method which we call from action
 	addReminder() {
-		console.log('this.state', this.state)
+		this.props.addReminder(this.state.text);
+	}
+
+	// its helper method which we call from action
+	deleteReminder(id) {
+		this.props.deleteReminder(id);
+	}
+
+	renderReminder() {
+		const { reminders } = this.props;
+		return (
+			<ul className="list-group col-sm-4">
+				{
+					reminders.map(reminder => {
+						return (
+							<li key={reminder.id} className="list-group-item">
+								<div className="list-item">{reminder.text}</div>
+								<div className='list-item delete-button'
+								onClick = {() => this.deleteReminder(reminder.id)}>
+									&#x2715;
+								</div>
+							</li>
+						)
+					})
+				}
+			</ul>
+		)
 	}
 
 	render() {
@@ -35,9 +63,16 @@ class App extends Component {
 					</button>
 				</div>
 				<div className='btn btn-danger'>Clear Reminders</div>
+				{ this.renderReminder() }
 			</div>
 		)
 	}
 }
 
-export default App
+function mapStateToProps(state) {
+	return{
+		reminders : state
+	}		
+}
+
+export default connect(mapStateToProps, { addReminder, deleteReminder })(App);
